@@ -1,16 +1,34 @@
-<p style="color: green"><%= notice %></p>
+<div class="max-w-4xl mx-auto px-4 py-12">
+  <div class="flex justify-between items-center mb-10 pb-6 border-b-2 border-slate-200">
+    <h1 class="text-3xl font-extrabold text-slate-800">メンバー設定</h1>
+    <%# 黒背景に白文字で、絶対に見えるボタン %>
+    <%= link_to '＋ 新規メンバー登録', new_member_path,
+        data: { turbo_frame: "member_form_area" },
+        class: "bg-slate-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg no-underline inline-block" %>
+  </div>
 
-<% content_for :title, "Members" %>
+  <div class="mb-8">
+    <%= turbo_frame_tag "member_form_area" %>
+  </div>
 
-<h1>Members</h1>
-
-<div id="members">
-  <% @members.each do |member| %>
-    <%= render member %>
-    <p>
-      <%= link_to "Show this member", member %>
-    </p>
-  <% end %>
+  <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+    <div class="divide-y divide-slate-100">
+      <% @members.each do |member| %>
+        <div class="p-8 hover:bg-slate-50 transition-colors">
+          <%= turbo_frame_tag dom_id(member) do %>
+            <div class="flex justify-between items-center">
+              <span class="text-2xl font-bold text-slate-700"><%= member.name %></span>
+              <div class="flex items-center">
+                <%# space-x-12 で、編集と削除の間に大きな距離を作りました %>
+                <div class="flex space-x-12">
+                  <%= link_to '編集', edit_member_path(member), data: { turbo_frame: dom_id(member) }, class: "text-blue-600 font-bold hover:underline no-underline text-lg" %>
+                  <%= link_to '削除', member, data: { turbo_method: :delete, turbo_confirm: '本当に削除しますか？' }, class: "text-red-400 font-bold hover:text-red-600 no-underline text-lg" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>
-
-<%= link_to "New member", new_member_path %>

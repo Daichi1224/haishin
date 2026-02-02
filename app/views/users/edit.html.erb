@@ -1,0 +1,27 @@
+<div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl mt-10">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+    <span class="mr-2">👤</span> プロフィール編集
+  </h1>
+
+  <%= form_with(model: @user, local: true, class: "space-y-6") do |f| %>
+
+    <div>
+      <%= f.label :name, "お名前", class: "block text-sm font-bold text-gray-700 mb-2" %>
+      <%= f.text_field :name, class: "w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-slate-800 outline-none transition" %>
+    </div>
+
+    <div>
+      <%= f.label :avatar, "アイコン画像（端末から選ぶ）", class: "block text-sm font-bold text-gray-700 mb-2" %>
+      <%# ここがファイル選択ボタンです %>
+      <%= f.file_field :avatar, class: "w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer" %>
+    </div>
+
+    <div class="pt-4">
+      <%= f.submit "変更を保存する", class: "w-full bg-slate-800 text-white font-bold py-3 rounded-lg hover:bg-slate-700 transform active:scale-95 transition cursor-pointer" %>
+    </div>
+
+    <div class="text-center mt-4">
+      <%= link_to "キャンセル", dashboards_show_path, class: "text-sm text-gray-500 hover:text-gray-700 underline" %>
+    </div>
+  <% end %>
+</div>

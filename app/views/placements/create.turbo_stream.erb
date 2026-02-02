@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "placement_frame_#{@site.id}_#{@date.to_s}" do %>
+  <%= render "dashboards/placement_cell", site: @site, date: @date, schedule: @schedule %>
+<% end %>

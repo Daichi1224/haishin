@@ -1,22 +1,15 @@
-<%= form_with(model: member) do |form| %>
-  <% if member.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(member.errors.count, "error") %> prohibited this member from being saved:</h2>
-
-      <ul>
-        <% member.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+<%# 確実にその場で更新を反映させるため turbo: false を設定 %>
+<%= form_with(model: member, data: { turbo: false }, class: "w-full") do |f| %>
+  <div class="flex flex-col gap-6">
+    <div>
+      <%= f.text_field :name, autofocus: true, placeholder: "スタッフの名前を入力...",
+          class: "w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-4 text-xl outline-none focus:border-blue-500 shadow-sm" %>
     </div>
-  <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
-  </div>
-
-  <div>
-    <%= form.submit %>
+    <div class="flex items-center gap-6">
+      <%# 鮮やかな青色の「保存ボタン」を設置 %>
+      <%= f.submit "変更を保存する", class: "bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold cursor-pointer hover:bg-blue-700 shadow-lg text-lg border-none" %>
+      <%= link_to "キャンセル", members_path, class: "text-slate-400 font-bold no-underline hover:text-slate-600" %>
+    </div>
   </div>
 <% end %>
