@@ -1,0 +1,71 @@
+<%= turbo_frame_tag "placement_frame_#{site.id}_#{date.to_s}" do %>
+  <% current_schedule = Schedule.find_by(date: date, site_id: site.id) %>
+
+  <%# 1. メンバーエリア %>
+  <div class="space-y-1 mb-4">
+    <% if current_schedule %>
+      <% current_schedule.placements.order(:position_order).each do |p| %>
+        <div class="group flex items-center justify-between bg-indigo-50 text-indigo-700 p-2 rounded-lg text-xs font-bold border border-indigo-100">
+          <span class="truncate">👤 <%= p.member.name %></span>
+          <div class="flex opacity-0 group-hover:opacity-100 transition-opacity space-x-1">
+            <%= button_to "▲", move_up_placement_path(p), method: :patch, class: "hover:text-indigo-900 text-[10px]" %>
+            <%= button_to "▼", move_down_placement_path(p), method: :patch, class: "hover:text-indigo-900 text-[10px]" %>
+            <%= link_to "×", placement_path(p), data: { turbo_method: :delete }, class: "text-red-500 hover:text-red-700 ml-1" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= form_with url: placements_path, class: "mt-2" do |f| %>
+      <%= f.hidden_field :date, value: date %>
+      <%= f.hidden_field :site_id, value: site.id %>
+      <div class="max-h-24 overflow-y-auto bg-gray-50 border border-gray-200 rounded-lg p-1 text-[10px]">
+        <% Member.all.each do |member| %>
+          <label class="flex items-center p-1 hover:bg-white rounded cursor-pointer transition">
+            <%# 配置済みのメンバーはチェックを入れない（追加用なので） %>
+            <%= check_box_tag "member_ids[]", member.id, false, id: "member_#{site.id}_#{date}_#{member.id}", class: "rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2" %>
+            <%= member.name %>
+          </label>
+        <% end %>
+      </div>
+      <%= f.submit "メンバー追加", class: "w-full mt-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold py-1.5 rounded-md transition cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <%# 2. 車両エリア %>
+  <div class="pt-3 border-t border-gray-100 mb-4">
+    <div class="flex flex-wrap gap-1 mb-2">
+      <% if current_schedule && current_schedule.vehicles.any? %>
+        <% current_schedule.vehicles.each do |v| %>
+          <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md text-[10px] font-black border border-amber-200">🚚 <%= v.name %></span>
+        <% end %>
+      <% end %>
+    </div>
+    <%= form_with url: vehicle_assignments_path do |f| %>
+      <%= f.hidden_field :date, value: date %>
+      <%= f.hidden_field :site_id, value: site.id %>
+      <div class="max-h-20 overflow-y-auto bg-amber-50/50 border border-amber-100 rounded-lg p-1 text-[10px]">
+        <% Vehicle.all.each do |v| %>
+          <label class="flex items-center p-1 hover:bg-white rounded cursor-pointer transition">
+            <% is_checked = current_schedule&.vehicle_ids&.include?(v.id) %>
+            <%= check_box_tag "vehicle_ids[]", v.id, is_checked, id: "vehicle_#{site.id}_#{date}_#{v.id}", class: "rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-2" %>
+            <%= v.name %>
+          </label>
+        <% end %>
+      </div>
+      <%= f.submit "車両確定", class: "w-full mt-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold py-1.5 rounded-md transition cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <%# 3. メモエリア %>
+  <div class="pt-3 border-t border-gray-100">
+    <%= form_with url: update_memo_schedules_path, method: :patch do |f| %>
+      <%= hidden_field_tag :date, date %>
+      <%= hidden_field_tag :site_id, site.id %>
+      <div class="text-[10px] text-gray-400 font-bold mb-1">MEMO</div>
+      <%= text_area_tag :memo, current_schedule&.memo, placeholder: "現場メモ...",
+          class: "w-full text-[11px] p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[40px]" %>
+      <%= f.submit "保存", class: "w-full mt-1 bg-slate-400 hover:bg-slate-500 text-white text-[10px] font-bold py-1 rounded-md transition cursor-pointer" %>
+    <% end %>
+  </div>
+<% end %>

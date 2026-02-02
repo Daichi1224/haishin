@@ -1,22 +1,28 @@
 class PlacementsController < ApplicationController
   def create
-    # 1. スケジュールを特定または作成
-    @schedule = Schedule.find_or_create_by(date: params[:date], site_id: params[:site_id])
+    # ViewのID特定のために日付と現場を保持
+    @date = params[:date]
+    @site = Site.find(params[:site_id])
 
-    # 2. 送られてきたメンバーIDの配列を取得（空の場合は空配列にする）
+    # 1. スケジュールを特定または作成
+    @schedule = Schedule.find_or_create_by(date: @date, site_id: @site.id)
+
+    # 2. メンバーID取得
     member_ids = params[:member_ids] || []
 
-    # 3. 選択された人数分、配置データを作成
+    # 3. トランザクション処理
     Placement.transaction do
       member_ids.each do |m_id|
-        # すでに配置済みの人はスキップ（重複防止）
         next if @schedule.placements.exists?(member_id: m_id)
-
         @schedule.placements.create!(member_id: m_id)
       end
     end
 
-    redirect_to root_path, notice: "配置を更新しました"
+    # Turbo Stream形式でレスポンスを返す
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to root_path(date: @date), notice: "配置を更新しました" }
+    end
   rescue => e
     logger.error "Batch Create Error: #{e.message}"
     redirect_to root_path, alert: "エラーが発生しました"

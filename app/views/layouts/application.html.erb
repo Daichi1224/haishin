@@ -1,23 +1,170 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Haishin" %></title>
+    <title>配神 - Dispatch Master</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
-
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <style>
+      .cute-nav {
+        background-color: #1e293b;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .user-area-right {
+        display: flex;
+        align-items: center;
+        position: relative;
+      }
+
+      .cute-avatar {
+        width: 48px;
+        height: 48px;
+        aspect-ratio: 1 / 1;
+        background-color: white;
+        border-radius: 9999px;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-right: 12px;
+        flex-shrink: 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      }
+      .cute-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+      .cute-name {
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        white-space: nowrap;
+        margin-right: 4px;
+      }
+
+      /* 矢印：真っ白にして目立たせる */
+      #menu-toggle-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s ease;
+      }
+
+      .arrow-white {
+        width: 24px; /* 少し大きく */
+        height: 24px;
+        fill: #ffffff !important; /* 絶対に白！ */
+      }
+
+      .cute-dropdown {
+        display: none;
+        position: absolute;
+        top: 130%;
+        right: 0;
+        background: white;
+        min-width: 200px;
+        border-radius: 12px;
+        box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+        z-index: 9999;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+      }
+
+      .is-open { display: block !important; }
+      .rotate-180 { transform: rotate(180deg); }
+
+      .dropdown-link {
+        display: block;
+        padding: 14px 20px;
+        text-decoration: none;
+        color: #334155;
+        font-size: 15px;
+        text-align: left;
+      }
+      .dropdown-link:hover { background-color: #f1f5f9; }
+    </style>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="bg-gray-50 text-gray-900 antialiased">
+    <nav class="cute-nav no-print mb-8">
+      <div class="text-2xl font-black italic tracking-tighter text-white">
+        <%= link_to "配神", dashboards_show_path, class: "no-underline text-white" %>
+      </div>
+
+      <div class="user-area-right">
+        <% if logged_in? %>
+          <div class="cute-avatar">
+            <% if current_user.respond_to?(:avatar) && current_user.avatar.attached? %>
+              <%= image_tag current_user.avatar, class: "w-full h-full object-cover" %>
+            <% else %>
+              <span style="color: #94a3b8; font-size: 24px;">👤</span>
+            <% end %>
+          </div>
+
+          <span class="cute-name"><%= current_user.name %></span>
+
+          <button id="menu-toggle-btn">
+            <svg id="arrow-icon" class="arrow-white" viewBox="0 0 20 20">
+              <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+            </svg>
+          </button>
+
+          <div id="dropdown-menu" class="cute-dropdown">
+            <div style="padding: 12px 20px; font-size: 11px; color: #64748b; font-weight: bold; border-bottom: 1px solid #f1f5f9; background: #f8fafc;">
+              アカウント設定
+            </div>
+
+            <% if logged_in? && current_user.respond_to?(:id) && current_user.id.is_a?(Integer) %>
+              <%= link_to "👤 プロフィールを編集", edit_user_path(current_user), class: "dropdown-link" %>
+            <% else %>
+              <div class="dropdown-link text-gray-400 cursor-not-allowed" style="color: #94a3b8;">
+                👤 ゲストは編集不可
+              </div>
+            <% end %>
+
+            <div style="border-top: 1px solid #f1f5f9;"></div>
+            <%= link_to "🚪 ログアウト", logout_path, data: { turbo_method: :delete }, class: "dropdown-link font-bold", style: "color: #ef4444;" %>
+          </div>
+        <% else %>
+          <%= link_to "ログイン", login_path, style: "color: white; text-decoration: none; font-weight: bold; border: 2px solid white; padding: 6px 18px; border-radius: 99px;" %>
+        <% end %>
+      </div>
+    </nav>
+
+    <main class="max-w-[1600px] mx-auto px-4 pb-20">
+      <%= yield %>
+    </main>
+
+    <script>
+      document.addEventListener('turbo:load', () => {
+        const btn = document.getElementById('menu-toggle-btn');
+        const menu = document.getElementById('dropdown-menu');
+        const arrow = document.getElementById('arrow-icon');
+
+        if (btn && menu) {
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('is-open');
+            arrow.classList.toggle('rotate-180');
+          };
+          document.onclick = () => {
+            menu.classList.remove('is-open');
+            arrow.classList.remove('rotate-180');
+          };
+        }
+      });
+    </script>
   </body>
 </html>

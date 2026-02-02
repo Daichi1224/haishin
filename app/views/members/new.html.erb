@@ -1,11 +1,9 @@
-<% content_for :title, "New member" %>
-
-<h1>New member</h1>
-
-<%= render "form", member: @member %>
-
-<br>
-
-<div>
-  <%= link_to "Back to members", members_path %>
-</div>
+<%= turbo_frame_tag "member_form_area" do %>
+  <div class="bg-blue-50 p-8 rounded-3xl border-2 border-blue-100 shadow-inner mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-blue-600 font-black uppercase tracking-widest text-sm">新規メンバー登録</h2>
+      <%= link_to "閉じる", members_path, class: "bg-white text-blue-500 px-3 py-1 rounded-lg shadow-sm text-xs font-bold no-underline" %>
+    </div>
+    <%= render "form", member: @member %>
+  </div>
+<% end %>

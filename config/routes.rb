@@ -1,4 +1,13 @@
 Rails.application.routes.draw do
+
+  get 'login', to: 'sessions#new'
+  post 'login', to: 'sessions#create'
+  delete 'logout', to: 'sessions#destroy'
+  post 'guest_login', to: 'sessions#guest_create'
+
+  get 'signup', to: 'users#new'
+  post 'signup', to: 'users#create'
+
   get "schedules/update"
   get "vehicle_assignments/create"
   get "vehicle_assignments/destroy"
@@ -6,21 +15,32 @@ Rails.application.routes.draw do
   get "placements/create"
   get "placements/destroy"
   get "dashboards/show"
+
   resources :vehicles
   resources :members
   resources :sites
+
   resources :placements, only: [:create, :destroy] do
     member do
       patch :move_up
       patch :move_down
     end
   end
+
   resources :vehicle_assignments, only: [:create]
+
   resources :schedules, only: [] do
     collection do
       patch :update_memo
     end
   end
+
+  resource :dashboard, singleton: true, controller: 'dashboards' do
+    get :weekly_report
+  end
+
+  resources :users, only: [:new, :create, :edit, :update]
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

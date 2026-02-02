@@ -1,12 +1,9 @@
-<% content_for :title, "Editing member" %>
-
-<h1>Editing member</h1>
-
-<%= render "form", member: @member %>
-
-<br>
-
-<div>
-  <%= link_to "Show this member", @member %> |
-  <%= link_to "Back to members", members_path %>
-</div>
+<%= turbo_frame_tag dom_id(@member) do %>
+  <div class="p-8 bg-amber-50 border-y border-amber-100 shadow-inner">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-amber-600 font-black uppercase tracking-widest text-sm">名前を編集</h2>
+      <%= link_to "キャンセル", members_path, class: "bg-white text-amber-500 px-3 py-1 rounded-lg shadow-sm text-xs font-bold no-underline" %>
+    </div>
+    <%= render "form", member: @member %>
+  </div>
+<% end %>
