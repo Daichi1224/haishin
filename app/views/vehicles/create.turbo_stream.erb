@@ -1,0 +1,17 @@
+<%= turbo_stream.update "vehicle_form_area", "" %>
+
+<%= turbo_stream.append "vehicles_list" do %>
+  <%= turbo_frame_tag dom_id(@vehicle), class: "block hover:bg-slate-50 transition-colors" do %>
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2.5rem;">
+      <div style="flex: 1;">
+        <span style="font-size: 1.25rem; font-weight: 800; color: #1e293b;"><%= @vehicle.name %></span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <%= button_to "▲", move_up_vehicle_path(@vehicle), method: :patch, data: { turbo: false }, style: "background-color: #f8fafc; color: #64748b; width: 42px; height: 42px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;" %>
+        <%= button_to "▼", move_down_vehicle_path(@vehicle), method: :patch, data: { turbo: false }, style: "background-color: #f8fafc; color: #64748b; width: 42px; height: 42px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;" %>
+        <%= link_to '編集', edit_vehicle_path(@vehicle), data: { turbo_frame: dom_id(@vehicle) }, style: "background-color: #eff6ff; color: #2563eb; padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: bold; text-decoration: none; font-size: 0.9rem; border: 1px solid #dbeafe; min-width: 80px; text-align: center;" %>
+        <%= button_to '削除', vehicle_path(@vehicle), method: :delete, data: { turbo_confirm: '本当に削除しますか？' }, style: "background-color: #fef2f2; color: #dc2626; padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: bold; border: 1px solid #fecaca; cursor: pointer; font-size: 0.9rem; min-width: 80px; text-align: center;" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

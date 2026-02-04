@@ -1,70 +1,87 @@
 class SitesController < ApplicationController
   before_action :set_site, only: %i[ show edit update destroy ]
 
-  # GET /sites or /sites.json
   def index
-    @sites = Site.all
+    u_id = nil
+    if defined?(current_user) && current_user.respond_to?(:id)
+      u_id = current_user.id
+    end
+    u_id ||= session[:user_id]
+
+    @sites = Site.where(user_id: u_id, active: true).order(:position)
   end
 
-  # GET /sites/1 or /sites/1.json
   def show
   end
 
-  # GET /sites/new
   def new
     @site = Site.new
   end
 
-  # GET /sites/1/edit
   def edit
   end
 
-  # POST /sites or /sites.json
   def create
     @site = Site.new(site_params)
 
+    u_id = current_user&.id || session[:user_id]
+    @site.user_id = u_id
+    @site.active = true
+
+    @site.position = (Site.where(user_id: u_id).maximum(:position) || 0) + 1
+
     respond_to do |format|
       if @site.save
-        format.html { redirect_to @site, notice: "Site was successfully created." }
-        format.json { render :show, status: :created, location: @site }
+        format.turbo_stream
+        format.html { redirect_to sites_path, notice: "現場を登録しました" }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @site.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PATCH/PUT /sites/1 or /sites/1.json
   def update
     respond_to do |format|
       if @site.update(site_params)
-        format.html { redirect_to @site, notice: "Site was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @site }
+        format.turbo_stream
+        format.html { redirect_to sites_path, notice: "現場情報を更新しました" }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @site.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # DELETE /sites/1 or /sites/1.json
   def destroy
-    @site.destroy!
+    @site.update(active: false)
 
     respond_to do |format|
-      format.html { redirect_to sites_path, notice: "Site was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
+      format.turbo_stream
+      format.html { redirect_to sites_path, notice: "現場を非表示にしました" }
     end
   end
 
+  def move_up
+    @site = Site.find(params[:id])
+    @site.move_higher
+    redirect_to sites_path
+  end
+
+  def move_down
+    @site = Site.find(params[:id])
+    @site.move_lower
+    redirect_to sites_path
+  end
+
   private
-    # Use callbacks to share common setup or constraints between actions.
+
     def set_site
-      @site = Site.find(params[:id])
+      u_id = current_user&.id || session[:user_id]
+      @site = Site.where(user_id: u_id).find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      redirect_to sites_path, alert: "指定された現場が見つかりません。"
     end
 
-    # Only allow a list of trusted parameters through.
     def site_params
-      params.require(:site).permit(:name)
+      params.require(:site).permit(:name, :user_id, :position, :active)
     end
 end

@@ -16,9 +16,27 @@ Rails.application.routes.draw do
   get "placements/destroy"
   get "dashboards/show"
 
-  resources :vehicles
-  resources :members
-  resources :sites
+  resources :members do
+    member do
+      patch :move_up
+      patch :move_down
+    end
+  end
+
+  resources :vehicles do
+    member do
+      patch :move_up
+      patch :move_down
+    end
+  end
+
+  resources :sites do
+    member do
+      patch :move_up
+      patch :move_down
+    end
+  end
+
 
   resources :placements, only: [:create, :destroy] do
     member do

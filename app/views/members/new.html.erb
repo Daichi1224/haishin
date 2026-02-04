@@ -1,9 +1,6 @@
 <%= turbo_frame_tag "member_form_area" do %>
-  <div class="bg-blue-50 p-8 rounded-3xl border-2 border-blue-100 shadow-inner mb-6">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-blue-600 font-black uppercase tracking-widest text-sm">新規メンバー登録</h2>
-      <%= link_to "閉じる", members_path, class: "bg-white text-blue-500 px-3 py-1 rounded-lg shadow-sm text-xs font-bold no-underline" %>
-    </div>
+  <div style="background-color: #f8fafc; padding: 1.5rem 2.5rem; border-radius: 1.5rem; border: 2px dashed #e2e8f0; margin-top: 1rem; margin-bottom: 2rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 900; color: #1e293b; margin-bottom: 1rem;">新規メンバー登録</h2>
     <%= render "form", member: @member %>
   </div>
 <% end %>

@@ -1,9 +1,6 @@
 <%= turbo_frame_tag dom_id(@member) do %>
-  <div class="p-8 bg-amber-50 border-y border-amber-100 shadow-inner">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-amber-600 font-black uppercase tracking-widest text-sm">名前を編集</h2>
-      <%= link_to "キャンセル", members_path, class: "bg-white text-amber-500 px-3 py-1 rounded-lg shadow-sm text-xs font-bold no-underline" %>
-    </div>
+  <div style="background-color: #f8fafc; padding: 1.5rem 2.5rem; border-radius: 1.5rem; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; margin: 0.5rem 0;">
+    <h2 style="font-size: 1.25rem; font-weight: 900; color: #1e293b; margin-bottom: 1rem;">名前を編集</h2>
     <%= render "form", member: @member %>
   </div>
 <% end %>

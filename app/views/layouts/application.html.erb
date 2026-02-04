@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>配神 - Dispatch Master</title>
+    <title>配神</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -11,6 +11,23 @@
     <%= javascript_importmap_tags %>
 
     <style>
+      .header-btn {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.2s;
+      }
+
+      .header-btn:hover {
+        background-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-1px);
+      }
+
       .cute-nav {
         background-color: #1e293b;
         display: flex;
@@ -51,8 +68,7 @@
         margin-right: 4px;
       }
 
-      /* 矢印：真っ白にして目立たせる */
-      #menu-toggle-btn {
+      ・menu-toggle-btn {
         background: none;
         border: none;
         cursor: pointer;
@@ -63,9 +79,9 @@
       }
 
       .arrow-white {
-        width: 24px; /* 少し大きく */
+        width: 24px;
         height: 24px;
-        fill: #ffffff !important; /* 絶対に白！ */
+        fill: #ffffff !important;
       }
 
       .cute-dropdown {
@@ -93,14 +109,24 @@
         font-size: 15px;
         text-align: left;
       }
-      .dropdown-link:hover { background-color: #f1f5f9; }
+      .dropdown-link:hover  {
+        background-color: #f1f5f9; }
+
     </style>
   </head>
 
   <body class="bg-gray-50 text-gray-900 antialiased">
     <nav class="cute-nav no-print mb-8">
-      <div class="text-2xl font-black italic tracking-tighter text-white">
-        <%= link_to "配神", dashboards_show_path, class: "no-underline text-white" %>
+      <div style="display: flex; align-items: center;">
+        <div class="text-2xl font-black italic tracking-tighter text-white">
+          <%= link_to "配神", dashboards_show_path, class: "no-underline text-white" %>
+        </div>
+
+        <div style="margin-left: 24px; display: flex; gap: 8px;">
+          <%= link_to "現場設定", sites_path, class: "header-btn" %>
+          <%= link_to "メンバー設定", members_path, class: "header-btn" %>
+          <%= link_to "車両設定", vehicles_path, class: "header-btn" %>
+        </div>
       </div>
 
       <div class="user-area-right">
@@ -126,7 +152,7 @@
               アカウント設定
             </div>
 
-            <% if logged_in? && current_user.respond_to?(:id) && current_user.id.is_a?(Integer) %>
+            <% if logged_in? && current_user.respond_to?(:id) && current_user.id.present? %>
               <%= link_to "👤 プロフィールを編集", edit_user_path(current_user), class: "dropdown-link" %>
             <% else %>
               <div class="dropdown-link text-gray-400 cursor-not-allowed" style="color: #94a3b8;">

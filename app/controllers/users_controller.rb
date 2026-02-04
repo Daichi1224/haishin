@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
-  #skip_before_action :logged_in_user, only: [:new, :create]
+  before_action :logged_in_user, only: [:edit, :update, :destroy]
+  before_action :correct_user,   only: [:edit, :update, :destroy]
 
   def new
     @user = User.new
@@ -11,25 +12,14 @@ class UsersController < ApplicationController
       session[:user_id] = @user.id
       redirect_to dashboards_show_path, notice: "ユーザー登録が完了しました！"
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
   def edit
-    if !current_user.respond_to?(:id) || current_user.id.nil?
-      redirect_to dashboards_show_path, alert: "ゲストユーザーはプロフィールを編集できません。"
-      return
-    end
-    @user = User.find(params[:id])
   end
 
   def update
-    if !current_user.respond_to?(:id) || current_user.id.nil?
-      redirect_to dashboards_show_path, alert: "ゲストユーザーは更新できません。"
-      return
-    end
-
-    @user = User.find(params[:id])
     if @user.update(user_params)
       flash[:success] = "プロフィールを更新しました！"
       redirect_to dashboards_show_path
@@ -38,9 +28,22 @@ class UsersController < ApplicationController
     end
   end
 
+  def destroy
+    @user.destroy
+    reset_session
+    redirect_to signup_path, notice: "アカウントを削除しました。ご利用ありがとうございました。", status: :see_other
+  end
+
   private
 
   def user_params
     params.require(:user).permit(:name, :email, :password, :password_confirmation, :avatar)
+  end
+
+  def correct_user
+    @user = User.find(params[:id])
+    if !current_user.respond_to?(:id) || current_user.id != @user.id
+      redirect_to dashboards_show_path, alert: "権限がありません。"
+    end
   end
 end

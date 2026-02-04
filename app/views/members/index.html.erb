@@ -1,10 +1,12 @@
 <div class="max-w-4xl mx-auto px-4 py-12">
+  <div style="margin-bottom: 20px;">
+    <%= link_to "← ダッシュボードに戻る", dashboards_show_path, style: "display: inline-block; padding: 8px 16px; background-color: #64748b; color: white; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: bold;" %>
+  </div>
   <div class="flex justify-between items-center mb-10 pb-6 border-b-2 border-slate-200">
     <h1 class="text-3xl font-extrabold text-slate-800">メンバー設定</h1>
-    <%# 黒背景に白文字で、絶対に見えるボタン %>
     <%= link_to '＋ 新規メンバー登録', new_member_path,
         data: { turbo_frame: "member_form_area" },
-        class: "bg-slate-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg no-underline inline-block" %>
+        class: "bg-slate-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg no-underline inline-block hover:bg-slate-700 transition" %>
   </div>
 
   <div class="mb-8">
@@ -12,22 +14,42 @@
   </div>
 
   <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
-    <div class="divide-y divide-slate-100">
+    <div id="members_list" class="divide-y divide-slate-100">
       <% @members.each do |member| %>
-        <div class="p-8 hover:bg-slate-50 transition-colors">
-          <%= turbo_frame_tag dom_id(member) do %>
-            <div class="flex justify-between items-center">
-              <span class="text-2xl font-bold text-slate-700"><%= member.name %></span>
-              <div class="flex items-center">
-                <%# space-x-12 で、編集と削除の間に大きな距離を作りました %>
-                <div class="flex space-x-12">
-                  <%= link_to '編集', edit_member_path(member), data: { turbo_frame: dom_id(member) }, class: "text-blue-600 font-bold hover:underline no-underline text-lg" %>
-                  <%= link_to '削除', member, data: { turbo_method: :delete, turbo_confirm: '本当に削除しますか？' }, class: "text-red-400 font-bold hover:text-red-600 no-underline text-lg" %>
-                </div>
-              </div>
+        <%= turbo_frame_tag dom_id(member), class: "block hover:bg-slate-50 transition-colors" do %>
+          <%# 横幅いっぱいに使い、名前は左、ボタン類は右にまとめます %>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2.5rem;">
+
+            <%# --- 左側：名前 --- %>
+            <div style="flex: 1;">
+              <span style="font-size: 1.25rem; font-weight: 800; color: #1e293b;"><%= member.name %></span>
             </div>
-          <% end %>
-        </div>
+
+            <%# --- 右側：ボタン類を等間隔（gap: 1.5rem）で配置 --- %>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+
+              <%# 1. 上ボタン %>
+              <%= button_to move_up_member_path(member), method: :patch, data: { turbo: false },
+                  style: "background-color: #f8fafc; color: #64748b; width: 42px; height: 42px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;" do %>▲<% end %>
+
+              <%# 2. 下ボタン %>
+              <%= button_to move_down_member_path(member), method: :patch, data: { turbo: false },
+                  style: "background-color: #f8fafc; color: #64748b; width: 42px; height: 42px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;" do %>▼<% end %>
+
+              <%# 3. 編集ボタン（薄い青のボタン） %>
+              <%= link_to '編集', edit_member_path(member),
+                  data: { turbo_frame: dom_id(member) },
+                  style: "background-color: #eff6ff; color: #2563eb; padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: bold; text-decoration: none; font-size: 0.9rem; border: 1px solid #dbeafe; min-width: 80px; text-align: center;" %>
+
+              <%# 4. 削除ボタン（薄い赤のボタン） %>
+              <%= button_to '削除', member_path(member),
+                  method: :delete,
+                  data: { turbo_confirm: '本当に削除しますか？' },
+                  style: "background-color: #fef2f2; color: #dc2626; padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: bold; border: 1px solid #fecaca; cursor: pointer; font-size: 0.9rem; min-width: 80px; text-align: center;" %>
+            </div>
+
+          </div>
+        <% end %>
       <% end %>
     </div>
   </div>

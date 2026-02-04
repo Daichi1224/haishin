@@ -1,11 +1,6 @@
-<% content_for :title, "New site" %>
-
-<h1>New site</h1>
-
-<%= render "form", site: @site %>
-
-<br>
-
-<div>
-  <%= link_to "Back to sites", sites_path %>
-</div>
+<%= turbo_frame_tag "site_form_area" do %>
+  <div style="background-color: #f8fafc; padding: 1.5rem 2.5rem; border-radius: 1.5rem; border: 2px dashed #e2e8f0; margin-top: 1rem; margin-bottom: 2rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 900; color: #1e293b; margin-bottom: 1rem;">新規現場登録</h2>
+    <%= render "form", site: @site %>
+  </div>
+<% end %>

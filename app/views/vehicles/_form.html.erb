@@ -1,22 +1,16 @@
-<%= form_with(model: vehicle) do |form| %>
-  <% if vehicle.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(vehicle.errors.count, "error") %> prohibited this vehicle from being saved:</h2>
-
-      <ul>
-        <% vehicle.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+<%= form_with(model: vehicle, class: "contents") do |form| %>
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div>
+      <%= form.text_field :name, placeholder: "車両名を入力（例：ハイエース）...",
+          style: "width: 100%; padding: 0.8rem 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; font-size: 1.125rem; background-color: white;" %>
     </div>
-  <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
-  </div>
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+      <%= form.submit "設定を保存する",
+          style: "background-color: #2563eb; color: #ffffff; padding: 0.8rem 2rem; border-radius: 0.75rem; font-weight: bold; border: none; cursor: pointer; min-width: 180px; font-size: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); appearance: none; -webkit-appearance: none;" %>
 
-  <div>
-    <%= form.submit %>
+      <%= link_to "キャンセル", vehicles_path,
+          style: "background-color: #fef2f2; color: #dc2626; padding: 0.8rem 2rem; border-radius: 0.75rem; font-weight: bold; border: 1px solid #fecaca; text-decoration: none; min-width: 180px; font-size: 1rem; text-align: center; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);" %>
+    </div>
   </div>
 <% end %>

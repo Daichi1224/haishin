@@ -57,3 +57,5 @@ group :test do
 end
 
 gem "tailwindcss-rails", "~> 4.4"
+
+gem "acts_as_list", "~> 1.2"

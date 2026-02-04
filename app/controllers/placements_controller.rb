@@ -31,7 +31,7 @@ class PlacementsController < ApplicationController
   def destroy
     @placement = Placement.find(params[:id])
     @placement.destroy
-    redirect_to root_path, notice: "削除しました"
+    redirect_to dashboard_path(date: @placement.schedule.date)
   end
 
   def move_up
@@ -50,7 +50,7 @@ class PlacementsController < ApplicationController
     redirect_to root_path
   rescue => e
     logger.error "Move Up Error: #{e.message}"
-    redirect_to root_path, alert: "移動に失敗しました"
+    redirect_to dashboard_path(date: @placement.schedule.date)
   end
 
   def move_down
@@ -68,6 +68,6 @@ class PlacementsController < ApplicationController
     redirect_to root_path
   rescue => e
     logger.error "Move Down Error: #{e.message}"
-    redirect_to root_path, alert: "移動に失敗しました"
+    redirect_to dashboard_path(date: @placement.schedule.date)
   end
 end

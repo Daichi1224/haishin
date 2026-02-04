@@ -1,16 +1,37 @@
-<p style="color: green"><%= notice %></p>
+<div class="max-w-4xl mx-auto px-4 py-12">
+  <div style="margin-bottom: 20px;">
+    <%= link_to "← ダッシュボードに戻る", dashboards_show_path, style: "display: inline-block; padding: 8px 16px; background-color: #64748b; color: white; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: bold;" %>
+  </div>
+  <div class="flex justify-between items-center mb-10 pb-6 border-b-2 border-slate-200">
+    <h1 class="text-3xl font-extrabold text-slate-800">現場設定</h1>
+    <%= link_to '＋ 新規現場登録', new_site_path, data: { turbo_frame: "site_form_area" }, class: "bg-slate-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg no-underline inline-block hover:bg-slate-700 transition" %>
+  </div>
 
-<% content_for :title, "Sites" %>
+  <div class="mb-8">
+    <%= turbo_frame_tag "site_form_area" %>
+  </div>
 
-<h1>Sites</h1>
+  <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+    <div id="sites_list" class="divide-y divide-slate-100">
+      <% @sites.each do |site| %>
+        <%= turbo_frame_tag dom_id(site), class: "block hover:bg-slate-50 transition-colors" do %>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2.5rem;">
+            <div style="flex: 1;">
+              <span style="font-size: 1.25rem; font-weight: 800; color: #1e293b;"><%= site.name %></span>
+            </div>
 
-<div id="sites">
-  <% @sites.each do |site| %>
-    <%= render site %>
-    <p>
-      <%= link_to "Show this site", site %>
-    </p>
-  <% end %>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+              <%# 並び替えボタン %>
+              <%= button_to "▲", move_up_site_path(site), method: :patch, data: { turbo: false }, style: "background-color: #f8fafc; color: #64748b; width: 42px; height: 42px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;" %>
+              <%= button_to "▼", move_down_site_path(site), method: :patch, data: { turbo: false }, style: "background-color: #f8fafc; color: #64748b; width: 42px; height: 42px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;" %>
+
+              <%# 編集・削除ボタン %>
+              <%= link_to '編集', edit_site_path(site), data: { turbo_frame: dom_id(site) }, style: "background-color: #eff6ff; color: #2563eb; padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: bold; text-decoration: none; font-size: 0.9rem; border: 1px solid #dbeafe; min-width: 80px; text-align: center;" %>
+              <%= button_to '削除', site_path(site), method: :delete, data: { turbo_confirm: '本当に削除しますか？' }, style: "background-color: #fef2f2; color: #dc2626; padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: bold; border: 1px solid #fecaca; cursor: pointer; font-size: 0.9rem; min-width: 80px; text-align: center;" %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
 </div>
-
-<%= link_to "New site", new_site_path %>
