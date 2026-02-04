@@ -1,11 +1,18 @@
 class SchedulesController < ApplicationController
   def update_memo
-    @schedule = Schedule.find_or_create_by(date: params[:date], site_id: params[:site_id])
+    # user_idを使わず、シンプルに日付と現場だけで特定する元の形に戻します
+    @schedule = Schedule.find_or_create_by(
+      date: params[:date],
+      site_id: params[:site_id]
+    )
 
     if @schedule.update(memo: params[:memo])
-      redirect_to root_path, notice: "メモを保存しました"
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_back fallback_location: root_path }
+      end
     else
-      redirect_to root_path, alert: "保存に失敗しました"
+      redirect_back fallback_location: root_path
     end
   end
 end

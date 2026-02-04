@@ -20,7 +20,7 @@
       <%= f.hidden_field :date, value: date %>
       <%= f.hidden_field :site_id, value: site.id %>
       <div class="max-h-24 overflow-y-auto bg-gray-50 border border-gray-200 rounded-lg p-1 text-[10px]">
-        <% Member.all.each do |member| %>
+        <% Member.where(active: true).order(:position).each do |member| %>
           <label class="flex items-center p-1 hover:bg-white rounded cursor-pointer transition">
             <%# 配置済みのメンバーはチェックを入れない（追加用なので） %>
             <%= check_box_tag "member_ids[]", member.id, false, id: "member_#{site.id}_#{date}_#{member.id}", class: "rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2" %>
@@ -45,7 +45,7 @@
       <%= f.hidden_field :date, value: date %>
       <%= f.hidden_field :site_id, value: site.id %>
       <div class="max-h-20 overflow-y-auto bg-amber-50/50 border border-amber-100 rounded-lg p-1 text-[10px]">
-        <% Vehicle.all.each do |v| %>
+        <% Vehicle.where(active: true).order(:position).each do |v| %>
           <label class="flex items-center p-1 hover:bg-white rounded cursor-pointer transition">
             <% is_checked = current_schedule&.vehicle_ids&.include?(v.id) %>
             <%= check_box_tag "vehicle_ids[]", v.id, is_checked, id: "vehicle_#{site.id}_#{date}_#{v.id}", class: "rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-2" %>

@@ -1,12 +1,6 @@
-<% content_for :title, "Editing vehicle" %>
-
-<h1>Editing vehicle</h1>
-
-<%= render "form", vehicle: @vehicle %>
-
-<br>
-
-<div>
-  <%= link_to "Show this vehicle", @vehicle %> |
-  <%= link_to "Back to vehicles", vehicles_path %>
-</div>
+<%= turbo_frame_tag dom_id(@vehicle) do %>
+  <div style="background-color: #f8fafc; padding: 1.5rem 2.5rem; border-radius: 1.5rem; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; margin: 0.5rem 0;">
+    <h2 style="font-size: 1.25rem; font-weight: 900; color: #1e293b; margin-bottom: 1rem;">車両名を編集</h2>
+    <%= render "form", vehicle: @vehicle %>
+  </div>
+<% end %>

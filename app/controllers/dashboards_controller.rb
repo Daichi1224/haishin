@@ -1,30 +1,36 @@
 class DashboardsController < ApplicationController
-  before_action :logged_in_user
-
   def show
-    # 表示したい基準日（パラメーターがなければ今日）
     @base_date = params[:date] ? Date.parse(params[:date]) : Date.today
-
-    # 月曜から日曜までの1週間分の日付を取得
     @start_date = @base_date.beginning_of_week
     @end_date = @base_date.end_of_week
     @dates = (@start_date..@end_date).to_a
 
-    # 画面に表示するためのデータを準備
-    @sites = Site.all
-    @members = Member.all
-    @vehicles = Vehicle.all
+    u_id = nil
 
-    # 1週間分のスケジュールをまとめて取得
-    @schedules = Schedule.where(date: @start_date..@end_date).includes(:placements)
+    if defined?(current_user) && current_user.respond_to?(:id) && current_user.present?
+      u_id = current_user.id
+    elsif session[:user_id]
+      u_id = session[:user_id]
+    end
+
+    @sites = Site.where(user_id: u_id, active: true).order(:position)
+    @members = Member.where(user_id: u_id, active: true).order(:position)
+    @vehicles = Vehicle.where(user_id: u_id, active: true).order(:position)
+    @schedules = Schedule.where(user_id: u_id, date: @start_date..@end_date).includes(:placements, :vehicle_assignments)
   end
 
   def weekly_report
-    # 表示の基準日（月曜日）を設定
     @base_date = params[:date] ? Date.parse(params[:date]) : Date.today.beginning_of_week
     @dates = (@base_date..@base_date + 6.days).to_a
 
-    # その期間の全スケジュールを、現場・メンバー・車両・メモを含めて一気に取得
-    @schedules = Schedule.where(date: @dates).includes(:site, placements: :member, vehicle_assignments: :vehicle)
+    u_id = nil
+    if defined?(current_user) && current_user.respond_to?(:id)
+      u_id = current_user.id
+    elsif session[:user_id]
+      u_id = session[:user_id]
+    end
+
+    @schedules = Schedule.where(user_id: u_id, date: @dates)
+                         .includes(:site, placements: :member, vehicle_assignments: :vehicle)
   end
 end

@@ -1,50 +1,46 @@
 <div class="p-4 md:p-8 bg-gray-50 min-h-screen">
-  <%# ヘッダー：タイトルと操作ボタン %>
   <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-    <div class="flex items-center space-x-6 mb-4 md:mb-0">
+    <div class="flex items-center space-x-6">
       <h1 class="text-3xl font-black text-slate-800 tracking-tighter">配神</h1>
       <div class="flex items-center bg-gray-100 rounded-lg p-1">
-        <%= link_to dashboard_path(date: @base_date - 7.days), class: "px-3 py-1 hover:bg-white hover:shadow-sm rounded-md transition text-lg" do %>←<% end %>
+        <%= link_to dashboard_path(date: @start_date - 7.days), class: "px-3 py-1 hover:bg-white rounded-md transition" do %>←<% end %>
         <span class="px-4 font-bold text-slate-700">
           <%= @start_date.strftime("%Y年%m月%d日") %> 〜 <%= @end_date.strftime("%m月%d日") %>
         </span>
-        <%= link_to dashboard_path(date: @base_date + 7.days), class: "px-3 py-1 hover:bg-white hover:shadow-sm rounded-md transition text-lg" do %>→<% end %>
+        <%= link_to dashboard_path(date: @start_date + 7.days), class: "px-3 py-1 hover:bg-white rounded-md transition" do %>→<% end %>
       </div>
-      <%= link_to dashboard_path(date: Date.today.beginning_of_week),
-          class: "ml-4 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-bold rounded-lg shadow-sm hover:bg-gray-50 transition active:scale-95" do %>
-        今週
-      <% end %>
+      <%= link_to "今週", dashboard_path(date: Date.today.beginning_of_week), class: "ml-4 px-4 py-2 bg-white border border-gray-300 rounded-xl text-sm font-bold shadow-sm" %>
     </div>
-    <%= link_to weekly_report_dashboard_path(date: @base_date),
-        class: "inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 transition-all transform active:scale-95" do %>
-      <span class="mr-2">📄</span> 印刷用ページを表示
+
+    <%= link_to weekly_report_dashboard_path(date: @start_date), class: "px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200" do %>
+      印刷用ページを表示
     <% end %>
   </div>
 
-  <%# メインテーブル %>
-  <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="w-full border-collapse table-fixed min-w-[1200px]">
+      <table class="w-full border-collapse">
         <thead>
-          <tr class="bg-slate-50 border-b border-gray-200">
-            <th class="w-40 p-4 text-left text-slate-500 font-bold sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">現場名</th>
+          <tr class="bg-slate-800 text-white">
+            <th class="p-6 text-left font-black text-lg min-w-[200px] sticky left-0 bg-slate-800 z-20">現場 / 日付</th>
             <% @dates.each do |date| %>
-              <th class="p-4 border-r border-gray-100 <%= 'text-red-500 bg-red-50/50' if date.sunday? %> <%= 'bg-blue-50/50' if date == Date.today %>">
-                <div class="text-xs uppercase font-bold opacity-60"><%= %w(日 月 火 水 木 金 土)[date.wday] %></div>
+              <th class="p-4 text-center min-w-[160px] border-l border-slate-700 <%= 'bg-indigo-900' if date == Date.today %>">
+                <div class="text-xs opacity-60"><%= %w(日 月 火 水 木 金 土)[date.wday] %></div>
                 <div class="text-lg font-black"><%= date.strftime("%m/%d") %></div>
               </th>
             <% end %>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody>
           <% @sites.each do |site| %>
-            <tr class="hover:bg-slate-50/50 transition-colors">
-              <td class="p-4 font-black text-slate-700 sticky left-0 bg-white z-10 border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+            <tr class="border-b border-gray-100">
+              <td class="p-4 font-black text-slate-700 sticky left-0 bg-white z-10 border-r shadow-sm">
                 <%= site.name %>
               </td>
               <% @dates.each do |date| %>
-                <td class="p-2 align-top h-[320px] border-r border-gray-50">
-                  <%= render "dashboards/placement_cell", site: site, date: date, schedule: nil %>
+                <td id="cell_<%= site.id %>" class="p-2 align-top h-[320px] border-r border-gray-50">
+                  <% schedule = @schedules.find { |s| s.date == date && s.site_id == site.id } %>
+                  <%= render "dashboards/placement_cell", site: site, date: date, schedule: schedule %>
                 </td>
               <% end %>
             </tr>
@@ -52,15 +48,5 @@
         </tbody>
       </table>
     </div>
-  </div>
-
-  <%# 下部メニュー %>
-  <div class="mt-12 p-6 bg-white rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
-    <div class="flex space-x-6 text-sm font-bold text-slate-600">
-      <%= link_to "現場管理", sites_path, class: "hover:text-indigo-600 transition" %>
-      <%= link_to "メンバー管理", members_path, class: "hover:text-indigo-600 transition" %>
-      <%= link_to "車両管理", vehicles_path, class: "hover:text-indigo-600 transition" %>
-    </div>
-    <div class="text-xs text-gray-400 font-medium tracking-widest uppercase">&copy; 2026 配神 Dispatch System</div>
   </div>
 </div>
