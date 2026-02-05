@@ -1,0 +1,22 @@
+ja:
+  activerecord:
+    attributes:
+      user:
+        name: "お名前"
+        email: "ログイン用ID"
+        password: "パスワード"
+        password_confirmation: "パスワード（確認用）"
+    errors:
+      messages:
+        record_invalid: "バリデーションに失敗しました: %{errors}"
+      models:
+        user:
+          attributes:
+            password:
+              too_short: "は%{count}文字以上で入力してください"
+  errors:
+    messages:
+      blank: "を入力してください"
+      confirmation: "が一致しません"
+      taken: "はすでに使用されています"
+      too_short: "は%{count}文字以上で入力してください"

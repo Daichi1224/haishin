@@ -1,24 +1,31 @@
 class PlacementsController < ApplicationController
   def create
-    # ViewのID特定のために日付と現場を保持
     @date = params[:date]
     @site = Site.find(params[:site_id])
 
-    # 1. スケジュールを特定または作成
-    @schedule = Schedule.find_or_create_by(date: @date, site_id: @site.id)
+    # ゲストでもID持ちでも、current_userを使えば安全に特定可能
+    u_id = current_user.id
+    @schedule = Schedule.find_or_create_by(date: @date, site_id: @site.id) do |s|
+      s.user_id = u_id
+    end
 
-    # 2. メンバーID取得
+    # 万が一user_idが空なら補完
+    @schedule.update(user_id: u_id) if @schedule.user_id.nil?
+
     member_ids = params[:member_ids] || []
 
-    # 3. トランザクション処理
     Placement.transaction do
+      # --- ここがポイント！ ---
+      # 1. 一度、このスケジュールの配置を全て削除（リセット）
+      @schedule.placements.destroy_all
+
+      # 2. チェックが入っているメンバーだけを新しく作り直す
+      # member_ids が空なら、何も作られない（＝レコードが0になる）
       member_ids.each do |m_id|
-        next if @schedule.placements.exists?(member_id: m_id)
         @schedule.placements.create!(member_id: m_id)
       end
     end
 
-    # Turbo Stream形式でレスポンスを返す
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to root_path(date: @date), notice: "配置を更新しました" }

@@ -72,7 +72,8 @@
         </div>
 
         <div style="padding: 15px;">
-         <% daily_schedules = @schedules.select { |s| s.date.to_s == date.to_s } %>
+          <%# 修正点：ダッシュボードでの現場の並び順（position）でソートを追加 %>
+          <% daily_schedules = @schedules.select { |s| s.date.to_s == date.to_s && (s.placements.any? || s.vehicle_assignments.any? || s.memo.present?) }.sort_by { |s| s.site&.position || 0 } %>
           <% if daily_schedules.any? %>
             <% daily_schedules.each do |schedule| %>
               <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">

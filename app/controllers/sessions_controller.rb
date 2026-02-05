@@ -1,6 +1,10 @@
 class SessionsController < ApplicationController
+  # ログイン画面、ログイン処理、ゲストログイン処理はログイン前でもアクセスOKにする
+  skip_before_action :require_login, only: [:new, :create, :guest_create]
+
   def new
-    redirect_to dashboards_show_path if session[:user_id] || session[:guest_user]
+    # すでにログインしていればダッシュボードへ
+    redirect_to root_path if logged_in?
   end
 
   def create
@@ -8,23 +12,27 @@ class SessionsController < ApplicationController
 
     if user && user.authenticate(params[:password])
       session[:user_id] = user.id
-      session[:guest_user] = nil #
-      redirect_to dashboards_show_path, notice: "ログインしました"
+      redirect_to root_path, notice: "ログインしました"
     else
-      flash.now[:alert] = "メールアドレスまたはパスワードが正しくありません"
-      render :new
+      flash.now[:alert] = "IDまたはパスワードが正しくありません"
+      render :new, status: :unprocessable_entity
     end
   end
 
   def guest_create
-    session[:guest_user] = true
-    session[:user_id] = nil
-    redirect_to dashboards_show_path, notice: "ゲストとしてログインしました（データは保存されません）"
+    # "guest" というID（email）のユーザーがいれば取得、いなければ作成する
+    user = User.find_or_create_by!(email: "guest") do |u|
+      u.name = "ゲストユーザー"
+      u.password = "password" # 6文字以上のバリデーションに合わせる
+      u.password_confirmation = "password"
+    end
+
+    session[:user_id] = user.id
+    redirect_to root_path, notice: "ゲストとしてログインしました。データは全ユーザーで共有されます。"
   end
 
   def destroy
-    session[:user_id] = nil
-    session[:guest_user] = nil
-    redirect_to login_path, notice: "ログアウトしました"
+    reset_session # セッションを完全にクリア
+    redirect_to login_path, notice: "ログアウトしました", status: :see_other
   end
 end

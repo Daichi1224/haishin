@@ -9,12 +9,21 @@
     <%# 通常ログイン %>
     <%= form_with url: login_path, local: true do |f| %>
       <div style="margin-bottom: 20px;">
-        <%= f.label :email, "メールアドレス", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
-        <%= f.email_field :email, required: true, style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
+        <%= f.label :email, "ログイン用ID", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
+        <%# email_field を text_field に変えて、独自の警告メッセージを追加しました %>
+        <%= f.text_field :email,
+            required: true,
+            oninvalid: "this.setCustomValidity('IDを入力してください')",
+            oninput: "this.setCustomValidity('')",
+            style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
       </div>
       <div style="margin-bottom: 25px;">
         <%= f.label :password, "パスワード", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
-        <%= f.password_field :password, required: true, style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
+        <%= f.password_field :password,
+            required: true,
+            oninvalid: "this.setCustomValidity('パスワードを入力してください')",
+            oninput: "this.setCustomValidity('')",
+            style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
       </div>
       <%= f.submit "ログイン", style: "width: 100%; padding: 14px; background: #3182ce; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;" %>
     <% end %>
@@ -27,13 +36,13 @@
 
     <div style="text-align: center; margin-top: 20px;">
       <p style="font-size: 0.85em; color: #718096;">アカウントをお持ちでない方は</p>
-      <a href="/signup" style="color: #3182ce; text-decoration: none; font-weight: bold; font-size: 0.9em;">新規ユーザー登録</a>
+      <a href="/signup" style="color: #3182ce; text-decoration: none; font-weight: bold; font-size: 1em;">新規ユーザー登録</a>
     </div><br>
 
     <%# ゲストログイン %>
     <div style="text-align: center;">
       <%= button_to "ゲストとして使ってみる", guest_login_path, method: :post, style: "width: 100%; padding: 12px; background: #edf2f7; color: #4a5568; border: none; border-radius: 6px; font-weight: bold; font-size: 0.9em; cursor: pointer;" %>
-      <p style="font-size: 0.8em; color: #718096; margin-bottom: 10px;">※データは保存されません</p>
+      <p style="font-size: 0.8em; color: #718096; margin-top: 7px;">※データは保存されません</p>
     </div>
 
   </div>

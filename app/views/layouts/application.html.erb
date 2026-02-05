@@ -152,11 +152,12 @@
               アカウント設定
             </div>
 
-            <% if logged_in? && current_user.respond_to?(:id) && current_user.id.present? %>
+            <%# 修正：ログイン中のIDが "guest" ではない時だけ、編集リンクを出す %>
+            <% if current_user.email != "guest" %>
               <%= link_to "👤 プロフィールを編集", edit_user_path(current_user), class: "dropdown-link" %>
             <% else %>
-              <div class="dropdown-link text-gray-400 cursor-not-allowed" style="color: #94a3b8;">
-                👤 ゲストは編集不可
+              <div class="dropdown-link" style="color: #94a3b8; font-size: 13px; cursor: default;">
+                🔒 ゲストは編集できません
               </div>
             <% end %>
 

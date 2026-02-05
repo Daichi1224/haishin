@@ -1,48 +1,72 @@
-<div class="flex justify-center items-center min-h-screen bg-[#F8FAFC] py-24 px-4">
+<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
+  <h1 class="text-2xl font-black text-slate-800 mb-6 text-center">プロフィール編集</h1>
 
-  <div class="w-full max-w-2xl bg-white rounded-[3rem] shadow-[0_25px_60px_rgba(0,0,0,0.03)] p-24 text-center">
+  <%= form_with model: @user, local: true, class: "space-y-6" do |f| %>
 
-    <div class="mb-16">
-      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">プロフィール設定</h1>
-      <p class="text-slate-400 mt-3 text-sm">アカウント情報を編集してください</p>
+    <%# --- 基本情報 --- %>
+    <div class="space-y-4">
+      <div>
+        <%= f.label :name, "お名前（表示名）", class: "block text-sm font-bold text-gray-700 mb-1" %>
+        <%= f.text_field :name, required: true,
+            oninvalid: "this.setCustomValidity('このフィールドを入力してください')",
+            oninput: "this.setCustomValidity('')",
+            class: "w-full p-3 px-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500" %>
+      </div>
+
+      <div>
+        <%= f.label :email, "ログイン用ID", class: "block text-sm font-bold text-gray-700 mb-1" %>
+        <%# email_field から text_field に変更して @ 制限を解除 %>
+        <%= f.text_field :email, required: true,
+            oninvalid: "this.setCustomValidity('このフィールドを入力してください')",
+            oninput: "this.setCustomValidity('')",
+            class: "w-full p-3 px-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500" %>
+      </div>
     </div>
 
-    <%= form_with(model: @user, local: true, class: "space-y-12") do |f| %>
+    <%# --- パスワード変更（任意） --- %>
+    <div class="pt-6 border-t border-gray-50">
+      <h2 class="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider text-center">パスワード変更（変更時のみ）</h2>
 
-      <div class="space-y-10 px-10 text-left">
-
-        <div class="space-y-3">
-          <%= f.label :name, "名前", class: "block text-xs font-bold text-slate-400 ml-1 tracking-widest uppercase" %>
-          <%= f.text_field :name, class: "w-full p-5.5 bg-slate-50/50 border border-slate-100 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-lg text-slate-700 shadow-sm" %>
+      <div class="space-y-4">
+        <div>
+          <%= f.label :password, "新しいパスワード", class: "block text-sm font-bold text-gray-700 mb-1" %>
+          <%= f.password_field :password, placeholder: "6文字以上",
+              minlength: 6,
+              oninvalid: "this.setCustomValidity(this.value.length < 6 ? 'パスワード は6文字以上で入力してください' : '')",
+              oninput: "this.setCustomValidity('')",
+              class: "w-full p-3 px-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500" %>
         </div>
 
-        <div class="space-y-3">
-          <%= f.label :email, "メールアドレス", class: "block text-xs font-bold text-slate-400 ml-1 tracking-widest uppercase" %>
-          <%= f.email_field :email, class: "w-full p-5.5 bg-slate-50/50 border border-slate-100 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-lg text-slate-700 shadow-sm" %>
-        </div>
-
-        <div class="pt-12 border-t border-slate-50">
-          <p class="text-xs font-bold text-slate-400 mb-8 ml-1 tracking-widest uppercase">
-            パスワード変更 <span class="ml-2 text-[10px] font-medium bg-slate-100 text-slate-500 px-3 py-1 rounded-full lowercase">Optional</span>
-          </p>
-          <div class="space-y-5">
-            <%= f.password_field :password, class: "w-full p-5.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-base focus:border-blue-500 outline-none transition-all shadow-sm", placeholder: "新しいパスワード" %>
-            <%= f.password_field :password_confirmation, class: "w-full p-5.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-base focus:border-blue-500 outline-none transition-all shadow-sm", placeholder: "確認用（再入力）" %>
-          </div>
+        <div>
+          <%= f.label :password_confirmation, "パスワード（確認用）", class: "block text-sm font-bold text-gray-700 mb-1" %>
+          <%# パスワード一致チェック用のスクリプトを追加 %>
+          <%= f.password_field :password_confirmation,
+              oninput: "this.setCustomValidity(this.value !== document.getElementById('user_password').value ? 'パスワード（確認用） が一致しません' : '')",
+              class: "w-full p-3 px-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500" %>
         </div>
       </div>
+    </div>
 
-      <div class="pt-12 px-10 space-y-6 text-center">
-        <%= f.submit "変更を保存する", class: "w-full bg-[#1e40af] text-white py-5 rounded-[1.5rem] font-bold hover:bg-blue-800 hover:-translate-y-1 transition-all shadow-2xl shadow-blue-100 cursor-pointer text-xl active:scale-[0.98]" %>
-        <%= link_to "キャンセルして戻る", dashboards_show_path, class: "inline-block text-sm text-slate-400 hover:text-slate-600 font-medium transition-colors pt-4 underline underline-offset-8 decoration-slate-200" %>
-      </div>
+    <%# --- アクションボタン --- %>
+    <div class="pt-6 space-y-3">
+      <%= f.submit "変更を保存", class: "w-full py-4 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition cursor-pointer" %>
+      <%= link_to "キャンセルして戻る", root_path, class: "block text-center py-2 text-sm text-gray-400 font-bold hover:text-gray-600 transition" %>
+    </div>
+  <% end %>
+
+  <%# --- 危険ゾーン（変更なし） --- %>
+  <div class="mt-12 pt-6 border-t border-red-50 text-center">
+    <p class="text-[10px] font-bold text-red-300 mb-2 uppercase tracking-widest">DANGER ZONE</p>
+
+    <%= button_to user_path(@user),
+        method: :delete,
+        class: "w-full py-2 text-xs text-red-400 border border-red-100 rounded-lg hover:bg-red-50 hover:text-red-600 transition font-bold",
+        form: {
+          data: {
+            turbo_confirm: "⚠️【最終確認：この操作は2度と取り消せません！】\n\n本当にアカウントを削除しますか？\n作成した全ての現場・メンバー・車両データが完全に消去されます。"
+          }
+        } do %>
+      アカウントを完全に削除
     <% end %>
-
-    <div class="mt-32 pt-12 border-t border-slate-50">
-      <%= button_to "アカウントを完全に削除する", @user, method: :delete,
-                    data: { turbo_confirm: "本当に削除しますか？\n全てのデータが完全に消去されます。" },
-                    class: "px-20 py-5 text-[11px] font-bold text-rose-400 border border-rose-100 rounded-full hover:bg-rose-500 hover:text-white transition-all cursor-pointer inline-block tracking-[0.2em] uppercase" %>
-    </div>
-
   </div>
 </div>
