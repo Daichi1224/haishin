@@ -3,5 +3,5 @@ class Site < ApplicationRecord
 
   acts_as_list column: :position
 
-  has_many :schedules
+  has_many :schedules, dependent: :destroy
 end

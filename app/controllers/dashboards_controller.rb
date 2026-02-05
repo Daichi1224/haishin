@@ -10,7 +10,9 @@ class DashboardsController < ApplicationController
     @sites = Site.where(user_id: u_id, active: true).order(:position)
     @members = Member.where(user_id: u_id, active: true).order(:position)
     @vehicles = Vehicle.where(user_id: u_id, active: true).order(:position)
-    @schedules = Schedule.where(user_id: u_id, date: @start_date..@end_date)
+
+    # 修正：現場IDを基準にして、自分の現場に紐づく予定だけを確実に持ってくる
+    @schedules = Schedule.where(site_id: @sites.pluck(:id), date: @start_date..@end_date)
                         .includes(:site, { placements: :member }, { vehicle_assignments: :vehicle })
   end
 
@@ -21,10 +23,10 @@ class DashboardsController < ApplicationController
     @dates = (@start_date..@end_date).to_a
 
     u_id = current_user&.id || session[:user_id]
+    @sites = Site.where(user_id: u_id, active: true)
 
-    # 【完全解決版】
-    # user_id が u_id と一致するもの、もしくは user_id が空(nil)のものを両方持ってくる
-    @schedules = Schedule.where(user_id: [u_id, nil], date: @start_date.to_s..@end_date.to_s)
+    # 修正：weekly_reportも同様に nil 許可を廃止し、自分の現場IDで絞り込む
+    @schedules = Schedule.where(site_id: @sites.pluck(:id), date: @start_date.to_s..@end_date.to_s)
                         .includes(:site, { placements: :member }, { vehicle_assignments: :vehicle })
   end
 end

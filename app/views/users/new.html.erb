@@ -6,19 +6,31 @@
       <p style="color: #718096; margin-top: 8px;">新規ユーザー登録</p>
     </div>
 
+    <%# --- エラーメッセージ表示エリア --- %>
+    <% if @user.errors.any? %>
+      <div style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.8em;">
+        <ul style="margin: 0; padding-left: 20px;">
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <%= form_with model: @user, url: signup_path, local: true do |f| %>
       <div style="margin-bottom: 20px;">
-        <%= f.label :name, "お名前（現場での表示名）", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
-        <%= f.text_field :name, required: true, placeholder: "例：大智", style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
+        <%= f.label :name, "お名前（表示名）", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
+        <%= f.text_field :name, required: true, placeholder: "例：テスト", style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
       </div>
 
       <div style="margin-bottom: 20px;">
-        <%= f.label :email, "メールアドレス", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
-        <%= f.email_field :email, required: true, style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
+        <%# 表示を「ID」に変更 %>
+        <%= f.label :email, "ログイン用ID", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
+        <%= f.text_field :email, required: true, placeholder: "例：test123", style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
       </div>
 
       <div style="margin-bottom: 20px;">
-        <%= f.label :password, "パスワード", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
+        <%= f.label :password, "パスワード（6文字以上）", style: "display: block; font-size: 0.85em; margin-bottom: 5px; color: #4a5568;" %>
         <%= f.password_field :password, required: true, style: "width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;" %>
       </div>
 
