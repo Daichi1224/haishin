@@ -41,8 +41,10 @@ class UsersController < ApplicationController
   end
 
   def correct_user
+    u_id = current_user&.respond_to?(:id) ? current_user.id : session[:user_id]
     @user = User.find(params[:id])
-    if !current_user.respond_to?(:id) || current_user.id != @user.id
+
+    if u_id.to_i != @user.id.to_i
       redirect_to dashboards_show_path, alert: "権限がありません。"
     end
   end

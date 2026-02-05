@@ -5,32 +5,26 @@ class DashboardsController < ApplicationController
     @end_date = @base_date.end_of_week
     @dates = (@start_date..@end_date).to_a
 
-    u_id = nil
-
-    if defined?(current_user) && current_user.respond_to?(:id) && current_user.present?
-      u_id = current_user.id
-    elsif session[:user_id]
-      u_id = session[:user_id]
-    end
+    u_id = current_user&.id || session[:user_id]
 
     @sites = Site.where(user_id: u_id, active: true).order(:position)
     @members = Member.where(user_id: u_id, active: true).order(:position)
     @vehicles = Vehicle.where(user_id: u_id, active: true).order(:position)
-    @schedules = Schedule.where(user_id: u_id, date: @start_date..@end_date).includes(:placements, :vehicle_assignments)
+    @schedules = Schedule.where(user_id: u_id, date: @start_date..@end_date)
+                        .includes(:site, { placements: :member }, { vehicle_assignments: :vehicle })
   end
 
   def weekly_report
-    @base_date = params[:date] ? Date.parse(params[:date]) : Date.today.beginning_of_week
-    @dates = (@base_date..@base_date + 6.days).to_a
+    @base_date = params[:date] ? Date.parse(params[:date]) : Date.today
+    @start_date = @base_date.beginning_of_week
+    @end_date = @base_date.end_of_week
+    @dates = (@start_date..@end_date).to_a
 
-    u_id = nil
-    if defined?(current_user) && current_user.respond_to?(:id)
-      u_id = current_user.id
-    elsif session[:user_id]
-      u_id = session[:user_id]
-    end
+    u_id = current_user&.id || session[:user_id]
 
-    @schedules = Schedule.where(user_id: u_id, date: @dates)
-                         .includes(:site, placements: :member, vehicle_assignments: :vehicle)
+    # 【完全解決版】
+    # user_id が u_id と一致するもの、もしくは user_id が空(nil)のものを両方持ってくる
+    @schedules = Schedule.where(user_id: [u_id, nil], date: @start_date.to_s..@end_date.to_s)
+                        .includes(:site, { placements: :member }, { vehicle_assignments: :vehicle })
   end
 end
