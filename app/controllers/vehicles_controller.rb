@@ -1,44 +1,33 @@
 class VehiclesController < ApplicationController
-  before_action :set_vehicle, only: %i[ show edit update destroy ]
+  before_action :set_vehicle, only: %i[ show edit update destroy move_up move_down ]
 
   def index
-    u_id = nil
-    if defined?(current_user) && current_user.respond_to?(:id)
-      u_id = current_user.id
-    elsif session[:user_id]
-      u_id = session[:user_id]
-    end
+    u_id = get_current_u_id
 
-    @vehicles = Vehicle.where(user_id: u_id).order(:position)
+    if u_id.present?
+      @vehicles = Vehicle.where(user_id: u_id, active: true).order(:position)
+    else
+      @vehicles = Vehicle.none
+    end
   end
 
-  # GET /vehicles/1 or /vehicles/1.json
   def show
   end
 
-  # GET /vehicles/new
   def new
     @vehicle = Vehicle.new
   end
 
-  # GET /vehicles/1/edit
   def edit
   end
 
-  # POST /vehicles or /vehicles.json
   def create
     @vehicle = Vehicle.new(vehicle_params)
-    u_id = nil
-    if defined?(current_user) && current_user.respond_to?(:id) && current_user.present?
-      u_id = current_user.id
-    elsif session[:user_id]
-      u_id = session[:user_id]
-    end
+    u_id = get_current_u_id
     @vehicle.user_id = u_id
     @vehicle.active = true
-
-    @vehicle.position = (Vehicle.maximum(:position) || 0) + 1
-    @vehicle.active = true
+    # 自分の車両リストの末尾に追加されるように計算
+    @vehicle.position = (Vehicle.where(user_id: u_id).maximum(:position) || 0) + 1
 
     respond_to do |format|
       if @vehicle.save
@@ -50,9 +39,7 @@ class VehiclesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /vehicles/1 or /vehicles/1.json
   def update
-    @vehicle = Vehicle.find(params[:id])
     respond_to do |format|
       if @vehicle.update(vehicle_params)
         format.turbo_stream
@@ -63,11 +50,8 @@ class VehiclesController < ApplicationController
     end
   end
 
-  # DELETE /vehicles/1 or /vehicles/1.json
   def destroy
-    @vehicle = Vehicle.find(params[:id])
     @vehicle.update(active: false)
-
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to vehicles_path, notice: '車両を非表示にしました' }
@@ -75,25 +59,45 @@ class VehiclesController < ApplicationController
   end
 
   def move_up
-    @vehicle = Vehicle.find(params[:id])
-    @vehicle.move_higher
+    u_id = get_current_u_id
+    higher_vehicle = Vehicle.where(user_id: u_id, active: true).where("position < ?", @vehicle.position).order(position: :desc).first
+    if higher_vehicle
+      current_pos = @vehicle.position
+      @vehicle.update(position: higher_vehicle.position)
+      higher_vehicle.update(position: current_pos)
+    end
     redirect_to vehicles_path
   end
 
   def move_down
-    @vehicle = Vehicle.find(params[:id])
-    @vehicle.move_lower
+    u_id = get_current_u_id
+    lower_vehicle = Vehicle.where(user_id: u_id, active: true).where("position > ?", @vehicle.position).order(position: :asc).first
+    if lower_vehicle
+      current_pos = @vehicle.position
+      @vehicle.update(position: lower_vehicle.position)
+      lower_vehicle.update(position: current_pos)
+    end
     redirect_to vehicles_path
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_vehicle
-      @vehicle = Vehicle.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def vehicle_params
-      params.require(:vehicle).permit(:name)
+  def set_vehicle
+    u_id = get_current_u_id
+    @vehicle = Vehicle.where(user_id: u_id).find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to vehicles_path, alert: "指定された車両が見つかりません。"
+  end
+
+  def get_current_u_id
+    if defined?(current_user) && current_user.respond_to?(:id) && current_user.present?
+      current_user.id
+    else
+      session[:user_id]
     end
+  end
+
+  def vehicle_params
+    params.require(:vehicle).permit(:name, :user_id, :position, :active)
+  end
 end
