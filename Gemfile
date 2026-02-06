@@ -59,7 +59,3 @@ end
 gem "tailwindcss-rails", "~> 4.4"
 
 gem "acts_as_list", "~> 1.2"
-
-gem "net-smtp", require: false
-gem "net-imap", require: false
-gem "net-pop"
