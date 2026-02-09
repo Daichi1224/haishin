@@ -2,8 +2,11 @@
 ▼アプリの概要
 建設現場の複雑な人員・車両配置を、直感的な操作で最適化し、ワンタップで見やすいPDF資料としてLINE送信できる、「現場管理者のための配置革命」サービスです。<br>
 
-画面キャプチャ
+▼画面キャプチャ
 <img width="1901" height="991" alt="Image" src="https://github.com/user-attachments/assets/bf65212e-1897-4f29-9aec-eb622ba9325c" /><br>
+
+▼資料<br>
+[『配神』.pdf](https://github.com/user-attachments/files/25182365/default.pdf)
 
 ▼アプリの使い方/基本的な操作方法
 1. 配置を完成させる：その日の現場ごとに、メンバーと車両をぽちぽちと直感的に配置します。
